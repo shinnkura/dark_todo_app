@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:crud_app/screens/add_page.dart';
 import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
@@ -9,11 +13,30 @@ class TodoListPage extends StatefulWidget {
 }
 
 class _TodoListPageState extends State<TodoListPage> {
+  List items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTodos();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo List'),
+      ),
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index] as Map;
+          return ListTile(
+            leading: CircleAvatar(child: Text('${index + 1}')),
+            title: Text(item['title']),
+            subtitle: Text(item['description']),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: navigateToDetail,
@@ -28,5 +51,23 @@ class _TodoListPageState extends State<TodoListPage> {
       builder: (context) => const AddTodoPage(),
     );
     Navigator.push(context, route);
+  }
+
+  
+
+  Future<void> fetchTodos() async {
+    const url = 'http://api.nstack.in/v1/todos?page=1&limit=10';
+    final uri = Uri.parse(url);
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final result = json['items'] as List<dynamic>;
+      setState(
+        () {
+          items = result;
+        },
+      );
+    } else {}
   }
 }

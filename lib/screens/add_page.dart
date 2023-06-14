@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -41,7 +40,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
           ),
           ElevatedButton(
             onPressed: submitData,
-            child: Text('Add'),
+            child: const Text('Add'),
           ),
         ],
       ),
