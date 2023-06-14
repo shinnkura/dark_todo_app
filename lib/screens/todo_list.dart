@@ -13,6 +13,7 @@ class TodoListPage extends StatefulWidget {
 }
 
 class _TodoListPageState extends State<TodoListPage> {
+  bool isLoading = true;
   List items = [];
 
   @override
@@ -27,16 +28,23 @@ class _TodoListPageState extends State<TodoListPage> {
       appBar: AppBar(
         title: const Text('Todo List'),
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index] as Map;
-          return ListTile(
-            leading: CircleAvatar(child: Text('${index + 1}')),
-            title: Text(item['title']),
-            subtitle: Text(item['description']),
-          );
-        },
+      body: Visibility(
+        visible: isLoading,
+        child: Center(child: CircularProgressIndicator()),
+        replacement: RefreshIndicator(
+          onRefresh: fetchTodos,
+          child: ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index] as Map;
+              return ListTile(
+                leading: CircleAvatar(child: Text('${index + 1}')),
+                title: Text(item['title']),
+                subtitle: Text(item['description']),
+              );
+            },
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: navigateToDetail,
@@ -53,8 +61,6 @@ class _TodoListPageState extends State<TodoListPage> {
     Navigator.push(context, route);
   }
 
-  
-
   Future<void> fetchTodos() async {
     const url = 'http://api.nstack.in/v1/todos?page=1&limit=10';
     final uri = Uri.parse(url);
@@ -68,6 +74,10 @@ class _TodoListPageState extends State<TodoListPage> {
           items = result;
         },
       );
-    } else {}
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 }
