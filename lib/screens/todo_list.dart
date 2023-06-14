@@ -41,6 +41,28 @@ class _TodoListPageState extends State<TodoListPage> {
                 leading: CircleAvatar(child: Text('${index + 1}')),
                 title: Text(item['title']),
                 subtitle: Text(item['description']),
+                trailing: PopupMenuButton(
+                  onSelected: (Value) {
+                    if (Value == 'edit') {
+                    } else if (Value == 'delete') {}
+                  },
+                  itemBuilder: (context) {
+                    return [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Text('Edit'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete'),
+                      ),
+                    ];
+                  },
+                ),
+                // trailing: Checkbox(
+                //   value: item['is_completed'],
+                //   onChanged: (value) {},
+                // ),
               );
             },
           ),
