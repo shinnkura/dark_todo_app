@@ -30,7 +30,6 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
       body: Visibility(
         visible: isLoading,
-        child: Center(child: CircularProgressIndicator()),
         replacement: RefreshIndicator(
           onRefresh: fetchTodos,
           child: ListView.builder(
@@ -45,7 +44,7 @@ class _TodoListPageState extends State<TodoListPage> {
                 trailing: PopupMenuButton(
                   onSelected: (Value) {
                     if (Value == 'edit') {
-                      navigateTodEditPage();
+                      navigateTodEditPage(item);
                     } else if (Value == 'delete') {
                       delteById(id);
                     }
@@ -71,6 +70,7 @@ class _TodoListPageState extends State<TodoListPage> {
             },
           ),
         ),
+        child: const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: navigateToDetail,
@@ -79,17 +79,23 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 
-  void navigateToDetail() {
-    // Navigator.pushNamed(context, '/detail');
+  void navigateToDetail() async {
     final route = MaterialPageRoute(
       builder: (context) => const AddTodoPage(),
     );
-    Navigator.push(context, route);
+    // await Navigator.push(context, route);
+    // fetchTodos();
+    final result = await Navigator.push(context, route);
+    if (result != null && result == 'update') {
+      setState(() {
+        fetchTodos();
+      });
+    }
   }
 
-  void navigateTodEditPage() {
+  void navigateTodEditPage(Map item) {
     final route = MaterialPageRoute(
-      builder: (context) => const AddTodoPage(),
+      builder: (context) => AddTodoPage(todo: item),
     );
     Navigator.push(context, route);
   }

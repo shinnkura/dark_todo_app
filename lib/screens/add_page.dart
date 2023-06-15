@@ -1,10 +1,15 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AddTodoPage extends StatefulWidget {
-  const AddTodoPage({super.key});
+  final Map? todo;
+  const AddTodoPage({
+    super.key,
+    this.todo,
+  });
 
   @override
   State<AddTodoPage> createState() => _AddTodoPageState();
@@ -13,12 +18,26 @@ class AddTodoPage extends StatefulWidget {
 class _AddTodoPageState extends State<AddTodoPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  bool isEdit = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.todo != null) {
+      isEdit = true;
+      titleController.text = widget.todo!['title'];
+      descriptionController.text = widget.todo!['description'];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Todo'),
+        title: Text(
+          isEdit ? 'Edit Todo' : 'Add Todo',
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -71,6 +90,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
       descriptionController.text = '';
       print('Creation Success');
       showSuccessMessage('Todo Created Successfully');
+      Navigator.pop(context, 'update');
     } else {
       showErroMessage('Creation Error');
     }
