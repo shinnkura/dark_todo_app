@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:crud_app/screens/add_page.dart';
+import 'package:crud_app/services/todo_service.dart';
+import 'package:crud_app/utils/snackbar_helper.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -137,38 +139,23 @@ class _TodoListPageState extends State<TodoListPage> {
         items = filtered;
       });
     } else {
-      showErroMessage('Deletion Failed');
+      showErroMessage(context, message: 'Deletion Failed');
     }
   }
 
   Future<void> fetchTodos() async {
-    const url = 'http://api.nstack.in/v1/todos?page=1&limit=10';
-    final uri = Uri.parse(url);
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-      final result = json['items'] as List<dynamic>;
+    final response = await TodoService.fetchTodos();
+    if (response != null) {
       setState(
         () {
-          items = result;
+          items = response;
         },
       );
+    } else {
+      showErroMessage(context, message: 'Something went wrong');
     }
-
     setState(() {
       isLoading = false;
     });
-  }
-
-  void showErroMessage(String message) {
-    final snackBar = SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.red,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
