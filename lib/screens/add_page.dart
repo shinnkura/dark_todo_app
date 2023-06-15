@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -22,12 +21,14 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    if (widget.todo != null) {
+    final todo = widget.todo;
+    if (todo != null) {
       isEdit = true;
-      titleController.text = widget.todo!['title'];
-      descriptionController.text = widget.todo!['description'];
+      final title = todo['title'];
+      final description = todo['description'];
+      titleController.text = title;
+      descriptionController.text = description;
     }
   }
 
@@ -36,7 +37,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isEdit ? 'Edit Todo' : 'Add Todo',
+          isEdit ? 'nEdit Todo' : 'Add Todo',
         ),
       ),
       body: ListView(
@@ -59,11 +60,45 @@ class _AddTodoPageState extends State<AddTodoPage> {
           ),
           ElevatedButton(
             onPressed: submitData,
-            child: const Text('Add'),
+            child: Text(
+              isEdit ? 'Update' : 'Add',
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> updateDate() async {
+    final todo = widget.todo;
+    if (todo == null) {
+      print('You can not update without todo data');
+      return;
+    }
+    final title = titleController.text;
+    final description = descriptionController.text;
+    final id = todo['_id'];
+    final body = {
+      "title": title,
+      "description": description,
+      "is_completed": false,
+    };
+    final url = 'http://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final response = await http.put(
+      uri,
+      body: jsonEncode(body),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessMessage('Updated Successfully');
+    } else {
+      showErroMessage('Update Error');
+    }
   }
 
   Future<void> submitData() async {
