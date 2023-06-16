@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:crud_app/screens/add_page.dart';
 import 'package:crud_app/services/todo_service.dart';
 import 'package:crud_app/utils/snackbar_helper.dart';
+import 'package:crud_app/widget/todo_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -47,38 +46,12 @@ class _TodoListPageState extends State<TodoListPage> {
               padding: const EdgeInsets.all(12),
               itemBuilder: (context, index) {
                 final item = items[index] as Map;
-                final id = item['_id'] as String;
-                return Card(
-                  child: ListTile(
-                    leading: CircleAvatar(child: Text('${index + 1}')),
-                    title: Text(item['title']),
-                    subtitle: Text(item['description']),
-                    trailing: PopupMenuButton(
-                      onSelected: (Value) {
-                        if (Value == 'edit') {
-                          navigateTodoEditPage(item);
-                        } else if (Value == 'delete') {
-                          delteById(id);
-                        }
-                      },
-                      itemBuilder: (context) {
-                        return [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Edit'),
-                          ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Delete'),
-                          ),
-                        ];
-                      },
-                    ),
-                    // trailing: Checkbox(
-                    //   value: item['is_completed'],
-                    //   onChanged: (value) {},
-                    // ),
-                  ),
+                // final id = item['_id'] as String;
+                return TodoCard(
+                  index: index,
+                  item: item,
+                  delteById: delteById,
+                  navigateTodoEditPage: navigateTodoEditPage,
                 );
               },
             ),
